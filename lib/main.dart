@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:upwork_barcode/pages/home_page.dart';
 import 'package:upwork_barcode/pages/scanner_page.dart';
 
 void main() {
@@ -25,33 +26,8 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Scanner App"),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ScannerPage(),
-              ),
-            );
-          },
-          child: const Text("Scan Barcode"),
-        ),
-      ),
+      debugShowCheckedModeBanner: false,
+      home: const HomePage(),
     );
   }
 }
