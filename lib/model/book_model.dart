@@ -29,7 +29,7 @@ class BookModel {
     priceGood = json['priceGood'];
     priceAcceptable = json['priceAcceptable'];
     requestDate = json['requestDate'];
-    imageUrl = null;
+    imageUrl = json['imageUrl'];
   }
 
   Map<String, dynamic> toJson() {

@@ -13,10 +13,37 @@ class ManualPage extends StatefulWidget {
 
 class _ManualPageState extends State<ManualPage> {
   TextEditingController productCodeController = TextEditingController();
+  bool isError = false;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    var bookProvider = Provider.of<BookProvider>(context);
+    print("BUILD MANUALPAGE");
+
+    var bookProvider = Provider.of<BookProvider>(context, listen: false);
+
+    void _onTap() async {
+      setState(() {
+        isLoading = true;
+        isError = false;
+      });
+      await bookProvider
+          .getProduct(productCodeController.text)
+          .then((isSuccess) {
+        isLoading = false;
+        if (isSuccess) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const DetailPage()),
+          );
+        } else {
+          setState(() {
+            isLoading = false;
+            isError = true;
+          });
+        }
+      });
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
@@ -24,20 +51,14 @@ class _ManualPageState extends State<ManualPage> {
         children: [
           TextField(
             controller: productCodeController,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
               hintText: "Barcode",
+              errorText: isError ? "Book with the barcode was not found" : null,
             ),
           ),
           GestureDetector(
-            onTap: () {
-              print("Klik search");
-              bookProvider.getProduct(productCodeController.text);
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => const DetailPage()),
-              // );
-            },
+            onTap: (isLoading) ? null : _onTap,
             child: Container(
               width: double.infinity,
               height: 50,
@@ -47,13 +68,16 @@ class _ManualPageState extends State<ManualPage> {
                 color: const Color(0xFFDCDCDC),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
-                "SEARCH ITEM",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
+              child: (isLoading)
+                  ? const SizedBox(
+                      width: 25, height: 25, child: CircularProgressIndicator())
+                  : const Text(
+                      "SEARCH ITEM",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 10),

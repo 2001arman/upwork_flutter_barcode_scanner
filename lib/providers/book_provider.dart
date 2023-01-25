@@ -11,7 +11,7 @@ class BookProvider with ChangeNotifier {
 
   List<BookModel> get resultBooks => _resultBooks;
 
-  Future<void> getProduct(String searchCode) async {
+  Future<bool> getProduct(String searchCode) async {
     _resultBooks.clear();
 
     var response = await ApiService().getBookData(searchCode);
@@ -20,8 +20,8 @@ class BookProvider with ChangeNotifier {
       _resultBooks = response;
     }
 
-    print(_resultBooks);
-
     notifyListeners();
+
+    return (_resultBooks.isNotEmpty) ? true : false;
   }
 }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:upwork_barcode/model/book_model.dart';
 import 'package:upwork_barcode/widget/container_price.dart';
+
+import '../providers/book_provider.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({Key? key}) : super(key: key);
@@ -9,9 +13,33 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  String rateItemRadio = "Very good";
+  String rateItemRadio = "priceVeryGood";
+
+  List<BookModel> sortRate(List<BookModel> books) {
+    switch (rateItemRadio) {
+      case "priceLikeNew":
+        books.sort((a, b) => a.priceLikeNew.compareTo(b.priceLikeNew));
+        break;
+      case "priceVeryGood":
+        books.sort((a, b) => a.priceVeryGood.compareTo(b.priceVeryGood));
+        break;
+      case "priceGood":
+        books.sort((a, b) => a.priceGood.compareTo(b.priceGood));
+        break;
+      default:
+        books.sort((a, b) => a.priceAcceptable.compareTo(b.priceAcceptable));
+        break;
+    }
+    return books;
+  }
+
   @override
   Widget build(BuildContext context) {
+    var books = Provider.of<BookProvider>(context, listen: false).resultBooks;
+    var firstBook = books[0];
+
+    sortRate(books);
+
     Widget bookSection() {
       return Container(
         width: double.infinity,
@@ -21,26 +49,31 @@ class _DetailPageState extends State<DetailPage> {
         ),
         child: Row(
           children: [
-            Image.network(
-              "https://d1o0zx25fn5p70.cloudfront.net/M9jxqudoLhDUKP7c9U-jLYadLYg=/fit-in/350x350/noupscale/assets.rebuy.de/products/001/447/026/covers/main.jpeg?t=1673855924",
-            ),
+            (firstBook.imageUrl != null)
+                ? Image.network(
+                    firstBook.imageUrl!,
+                    height: 100,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox(),
+                  )
+                : const SizedBox(),
             const SizedBox(width: 20),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
-                    "The Duck and the Owl - Hanna Johansen",
-                    style: TextStyle(
+                    firstBook.name,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
-                    "9783473520985",
-                    style: TextStyle(
+                    firstBook.ean,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
@@ -87,13 +120,14 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                   const SizedBox(width: 20),
                   RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       text: "Purchase prices\n",
-                      style: TextStyle(color: Colors.black, fontSize: 12),
+                      style: const TextStyle(color: Colors.black, fontSize: 12),
                       children: [
                         TextSpan(
-                          text: "€0.01 - €0.47",
-                          style: TextStyle(
+                          text:
+                              "€${books[0].priceVeryGood / 100} - €${books.last.priceVeryGood / 100}",
+                          style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w700,
                             fontSize: 16,
@@ -105,8 +139,11 @@ class _DetailPageState extends State<DetailPage> {
                 ],
               ),
             ),
-            const ContainerPrice(vendor: "reBuy.de", price: 0.47),
-            const ContainerPrice(vendor: "zoxs.de", price: 0.01),
+            ...books
+                .map((book) => ContainerPrice(
+                    vendor: book.vendorName,
+                    price: book.priceVeryGood.toDouble() / 100))
+                .toList()
           ],
         ),
       );
@@ -145,61 +182,53 @@ class _DetailPageState extends State<DetailPage> {
             ),
             Column(
               children: [
-                ListTile(
+                RadioListTile(
+                  value: "priceLikeNew",
+                  groupValue: rateItemRadio,
                   title: const Text("Like new"),
-                  contentPadding: EdgeInsets.zero,
-                  minLeadingWidth: 0,
-                  leading: Radio(
-                    value: "Like new",
-                    groupValue: rateItemRadio,
-                    onChanged: (newValue) {
-                      setState(() {
-                        rateItemRadio = newValue.toString();
-                      });
-                    },
-                  ),
+                  contentPadding: const EdgeInsets.only(left: 5),
+                  onChanged: (newValue) {
+                    setState(() {
+                      rateItemRadio = newValue.toString();
+                      sortRate(books);
+                    });
+                  },
                 ),
-                ListTile(
-                  title: const Text("Very good"),
-                  contentPadding: EdgeInsets.zero,
-                  minLeadingWidth: 0,
-                  leading: Radio(
-                    value: "Very good",
-                    groupValue: rateItemRadio,
-                    onChanged: (newValue) {
-                      setState(() {
-                        rateItemRadio = newValue.toString();
-                      });
-                    },
-                  ),
+                RadioListTile(
+                  value: "priceVeryGood",
+                  groupValue: rateItemRadio,
+                  title: const Text("Very Good"),
+                  contentPadding: const EdgeInsets.only(left: 5),
+                  onChanged: (newValue) {
+                    setState(() {
+                      rateItemRadio = newValue.toString();
+                      sortRate(books);
+                    });
+                  },
                 ),
-                ListTile(
+                RadioListTile(
+                  value: "priceGood",
+                  groupValue: rateItemRadio,
                   title: const Text("Good"),
-                  contentPadding: EdgeInsets.zero,
-                  minLeadingWidth: 0,
-                  leading: Radio(
-                    value: "Good",
-                    groupValue: rateItemRadio,
-                    onChanged: (newValue) {
-                      setState(() {
-                        rateItemRadio = newValue.toString();
-                      });
-                    },
-                  ),
+                  contentPadding: const EdgeInsets.only(left: 5),
+                  onChanged: (newValue) {
+                    setState(() {
+                      rateItemRadio = newValue.toString();
+                      sortRate(books);
+                    });
+                  },
                 ),
-                ListTile(
+                RadioListTile(
+                  value: "priceAcceptable",
+                  groupValue: rateItemRadio,
                   title: const Text("Acceptable"),
-                  contentPadding: EdgeInsets.zero,
-                  minLeadingWidth: 0,
-                  leading: Radio(
-                    value: "Acceptable",
-                    groupValue: rateItemRadio,
-                    onChanged: (newValue) {
-                      setState(() {
-                        rateItemRadio = newValue.toString();
-                      });
-                    },
-                  ),
+                  contentPadding: const EdgeInsets.only(left: 5),
+                  onChanged: (newValue) {
+                    setState(() {
+                      rateItemRadio = newValue.toString();
+                      sortRate(books);
+                    });
+                  },
                 ),
               ],
             )

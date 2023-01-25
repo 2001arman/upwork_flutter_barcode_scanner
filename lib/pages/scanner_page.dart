@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:upwork_barcode/pages/detail_page.dart';
+import 'package:upwork_barcode/providers/book_provider.dart';
 
 class ScannerPage extends StatefulWidget {
   const ScannerPage({Key? key}) : super(key: key);
@@ -29,18 +31,40 @@ class _ScannerPageState extends State<ScannerPage> {
     controller?.resumeCamera();
   }
 
+  void getBook(String code) async {
+    print("FETCHHHHH $code");
+    await context.read<BookProvider>().getProduct(code).then((isSuccess) {
+      if (isSuccess) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const DetailPage()),
+        );
+      } else {
+        print("Not found");
+        // setState(() {
+        //   isLoading = false;
+        //   isError = true;
+        // });
+      }
+    });
+  }
+
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     this.controller!.resumeCamera();
     controller.scannedDataStream.listen((scanData) {
       controller.pauseCamera();
+      print("HASILLLL : " + scanData.code.toString());
+      String searchCode = scanData.code.toString();
+      getBook(searchCode);
+
       setState(() {
         result = scanData;
       });
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const DetailPage()),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const DetailPage()),
+      // );
     });
   }
 

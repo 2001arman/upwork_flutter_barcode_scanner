@@ -22,10 +22,12 @@ class ApiService {
       var url = Uri.parse(endpoint);
 
       var response = await http.get(url);
-      final Map<String, dynamic> parsed = jsonDecode(response.body);
 
-      if (parsed['name'] != "NotFound") {
-        data.add(BookModel.fromJson(parsed));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> parsed = jsonDecode(response.body);
+        if (parsed['name'] != "NotFound") {
+          data.add(BookModel.fromJson(parsed));
+        }
       }
     });
 
