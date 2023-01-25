@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:upwork_barcode/pages/detail_page.dart';
+import 'package:upwork_barcode/providers/book_provider.dart';
 import 'package:upwork_barcode/service/api_service.dart';
 
 class ManualPage extends StatefulWidget {
@@ -10,25 +12,31 @@ class ManualPage extends StatefulWidget {
 }
 
 class _ManualPageState extends State<ManualPage> {
+  TextEditingController productCodeController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    var bookProvider = Provider.of<BookProvider>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
       child: Column(
         children: [
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            controller: productCodeController,
+            decoration: const InputDecoration(
               border: OutlineInputBorder(),
               hintText: "Barcode",
             ),
           ),
           GestureDetector(
             onTap: () {
-              // ApiService().getBookData();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DetailPage()),
-              );
+              print("Klik search");
+              bookProvider.getProduct(productCodeController.text);
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => const DetailPage()),
+              // );
             },
             child: Container(
               width: double.infinity,
