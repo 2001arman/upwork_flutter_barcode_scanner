@@ -40,6 +40,19 @@ class _DetailPageState extends State<DetailPage> {
 
     sortRate(books);
 
+    String changePriceFromRadio() {
+      if (rateItemRadio == "priceLikeNew") {
+        return "€${books[0].priceLikeNew / 100} - €${books.last.priceLikeNew / 100}";
+      } else if (rateItemRadio == "priceVeryGood") {
+        return "€${books[0].priceVeryGood / 100} - €${books.last.priceVeryGood / 100}";
+      } else if (rateItemRadio == "priceGood") {
+        return "€${books[0].priceGood / 100} - €${books.last.priceGood / 100}";
+      } else if (rateItemRadio == "priceAcceptable") {
+        return "€${books[0].priceAcceptable / 100} - €${books.last.priceAcceptable / 100}";
+      }
+      return "€${books[0].priceVeryGood / 100} - €${books.last.priceVeryGood / 100}";
+    }
+
     Widget bookSection() {
       return Container(
         width: double.infinity,
@@ -125,8 +138,7 @@ class _DetailPageState extends State<DetailPage> {
                       style: const TextStyle(color: Colors.black, fontSize: 12),
                       children: [
                         TextSpan(
-                          text:
-                              "€${books[0].priceVeryGood / 100} - €${books.last.priceVeryGood / 100}",
+                          text: changePriceFromRadio(),
                           style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w700,
