@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:upwork_barcode/pages/detail_page.dart';
 
 class ScannerPage extends StatefulWidget {
   const ScannerPage({Key? key}) : super(key: key);
@@ -19,27 +20,33 @@ class _ScannerPageState extends State<ScannerPage> {
   @override
   void reassemble() {
     super.reassemble();
-    // if (Platform.isAndroid) {
-    //   controller!.pauseCamera();
-    // } else if (Platform.isIOS) {
-    //   controller!.resumeCamera();
-    // }
     controller!.resumeCamera();
-    // controller!.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    controller?.resumeCamera();
   }
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     this.controller!.resumeCamera();
     controller.scannedDataStream.listen((scanData) {
+      controller.pauseCamera();
       setState(() {
         result = scanData;
       });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const DetailPage()),
+      );
     });
   }
 
   @override
   void initState() {
+    controller?.resumeCamera();
     super.initState();
   }
 
@@ -51,20 +58,8 @@ class _ScannerPageState extends State<ScannerPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Future<void> startBarcodeScanStream() async {
-    //   FlutterBarcodeScanner.getBarcodeStreamReceiver(
-    //           '#ff6666', 'Cancel', true, ScanMode.BARCODE)!
-    //       .listen((barcode) => print(barcode));
-    // }
-
     return Column(
       children: <Widget>[
-        // ElevatedButton(
-        //   onPressed: () {
-        //     startBarcodeScanStream();
-        //   },
-        //   child: Text("barcode stream"),
-        // ),
         Expanded(
           flex: 5,
           child: QRView(
@@ -76,9 +71,15 @@ class _ScannerPageState extends State<ScannerPage> {
           flex: 1,
           child: Center(
             child: (result != null)
-                ? Text(
-                    'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
-                : Text('Scan a code'),
+                ? ElevatedButton(
+                    onPressed: () {
+                      controller?.resumeCamera();
+                      result = null;
+                      setState(() {});
+                    },
+                    child: const Text("Scan Again"),
+                  )
+                : const Text('Scan a code'),
           ),
         )
       ],
