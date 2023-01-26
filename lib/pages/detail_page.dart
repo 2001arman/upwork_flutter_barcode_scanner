@@ -53,6 +53,21 @@ class _DetailPageState extends State<DetailPage> {
       return "€${books[0].priceVeryGood / 100} - €${books.last.priceVeryGood / 100}";
     }
 
+    Widget checkImage(String url) {
+      try {
+        print(url);
+        print("Network image");
+        return Image.network(
+          url,
+          height: 100.0,
+          fit: BoxFit.cover,
+        );
+      } catch (e) {
+        print("Network image GAGALLL");
+        return const Icon(Icons.image);
+      }
+    }
+
     Widget bookSection() {
       return Container(
         width: double.infinity,
@@ -63,12 +78,7 @@ class _DetailPageState extends State<DetailPage> {
         child: Row(
           children: [
             (firstBook.imageUrl != null)
-                ? Image.network(
-                    firstBook.imageUrl!,
-                    height: 100,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const SizedBox(),
-                  )
+                ? checkImage(firstBook.imageUrl!)
                 : const SizedBox(),
             const SizedBox(width: 20),
             Expanded(
