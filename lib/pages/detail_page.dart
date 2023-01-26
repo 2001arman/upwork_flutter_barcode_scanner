@@ -38,19 +38,30 @@ class _DetailPageState extends State<DetailPage> {
     var books = Provider.of<BookProvider>(context, listen: false).resultBooks;
     var firstBook = books[0];
 
-    sortRate(books);
+    books = sortRate(books);
 
     String changePriceFromRadio() {
       if (rateItemRadio == "priceLikeNew") {
-        return "€${books[0].priceLikeNew / 100} - €${books.last.priceLikeNew / 100}";
-      } else if (rateItemRadio == "priceVeryGood") {
-        return "€${books[0].priceVeryGood / 100} - €${books.last.priceVeryGood / 100}";
+        return "${books[0].priceLikeNew / 100} € - ${books.last.priceLikeNew / 100} €";
       } else if (rateItemRadio == "priceGood") {
-        return "€${books[0].priceGood / 100} - €${books.last.priceGood / 100}";
+        return "${books[0].priceGood / 100} € - ${books.last.priceGood / 100} €";
       } else if (rateItemRadio == "priceAcceptable") {
-        return "€${books[0].priceAcceptable / 100} - €${books.last.priceAcceptable / 100}";
+        return "${books[0].priceAcceptable / 100} € - ${books.last.priceAcceptable / 100} €";
+      } else {
+        return "${books[0].priceVeryGood / 100} € - ${books.last.priceVeryGood / 100} €";
       }
-      return "€${books[0].priceVeryGood / 100} - €${books.last.priceVeryGood / 100}";
+    }
+
+    double priceConditionSelected(BookModel book) {
+      if (rateItemRadio == "priceLikeNew") {
+        return book.priceLikeNew.toDouble() / 100;
+      } else if (rateItemRadio == "priceGood") {
+        return book.priceGood.toDouble() / 100;
+      } else if (rateItemRadio == "priceAcceptable") {
+        return book.priceAcceptable.toDouble() / 100;
+      } else {
+        return book.priceVeryGood.toDouble() / 100;
+      }
     }
 
     Widget bookSection() {
@@ -153,8 +164,10 @@ class _DetailPageState extends State<DetailPage> {
             ),
             ...books
                 .map((book) => ContainerPrice(
-                    vendor: book.vendorName,
-                    price: book.priceVeryGood.toDouble() / 100))
+                      vendor: book.vendorName,
+                      price: priceConditionSelected(book),
+                      website: book.website,
+                    ))
                 .toList()
           ],
         ),

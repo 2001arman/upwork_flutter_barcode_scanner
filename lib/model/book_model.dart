@@ -8,6 +8,7 @@ class BookModel {
     required this.priceGood,
     required this.priceAcceptable,
     required this.requestDate,
+    required this.website,
     this.imageUrl,
   });
   late final String name;
@@ -18,6 +19,7 @@ class BookModel {
   late final int priceGood;
   late final int priceAcceptable;
   late final int requestDate;
+  late final String website;
   late final String? imageUrl;
 
   BookModel.fromJson(Map<String, dynamic> json) {
@@ -30,19 +32,20 @@ class BookModel {
     priceAcceptable = json['priceAcceptable'];
     requestDate = json['requestDate'];
     imageUrl = json['imageUrl'];
+    website = json['website'];
   }
 
   Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['name'] = name;
-    _data['ean'] = ean;
-    _data['vendorName'] = vendorName;
-    _data['priceLikeNew'] = priceLikeNew;
-    _data['priceVeryGood'] = priceVeryGood;
-    _data['priceGood'] = priceGood;
-    _data['priceAcceptable'] = priceAcceptable;
-    _data['requestDate'] = requestDate;
-    _data['imageUrl'] = imageUrl;
-    return _data;
+    final data = <String, dynamic>{};
+    data['name'] = name;
+    data['ean'] = ean;
+    data['vendorName'] = vendorName;
+    data['priceLikeNew'] = priceLikeNew;
+    data['priceVeryGood'] = priceVeryGood;
+    data['priceGood'] = priceGood;
+    data['priceAcceptable'] = priceAcceptable;
+    data['requestDate'] = requestDate;
+    data['imageUrl'] = imageUrl;
+    return data;
   }
 }
