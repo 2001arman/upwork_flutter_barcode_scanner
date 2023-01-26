@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:upwork_barcode/model/book_model.dart';
 import 'package:upwork_barcode/widget/container_price.dart';
-
+import 'package:http/http.dart' as http;
 import '../providers/book_provider.dart';
 
 class DetailPage extends StatefulWidget {
@@ -31,6 +32,22 @@ class _DetailPageState extends State<DetailPage> {
         break;
     }
     return books;
+  }
+
+  bool imageReady = false;
+
+  checkImageValidity(String image) async {
+    var url = Uri.parse(image);
+    http.Response response = await http.get(url);
+    try {
+      if (response.statusCode == 200) {
+        setState(() {
+          imageReady = true; // It's valid
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
@@ -64,18 +81,17 @@ class _DetailPageState extends State<DetailPage> {
       }
     }
 
-    Widget checkImage(String url) {
+    Future<String?> checkImage(String url) async {
+      var image = Uri.parse(url);
+      http.Response response = await http.get(image);
       try {
-        print(url);
-        print("Network image");
-        return Image.network(
-          url,
-          height: 100.0,
-          fit: BoxFit.cover,
-        );
+        if (response.statusCode == 200) {
+          return "Done";
+        } else {
+          return "Failed";
+        }
       } catch (e) {
-        print("Network image GAGALLL");
-        return const Icon(Icons.image);
+        return "Failed";
       }
     }
 
@@ -89,7 +105,18 @@ class _DetailPageState extends State<DetailPage> {
         child: Row(
           children: [
             (firstBook.imageUrl != null)
-                ? checkImage(firstBook.imageUrl!)
+                ? FutureBuilder(
+                    future: checkImage(firstBook.imageUrl!),
+                    builder: (context, snapshot) {
+                      if (snapshot.data == "Done") {
+                        return Image.network(
+                          firstBook.imageUrl!,
+                          height: 100.0,
+                          fit: BoxFit.cover,
+                        );
+                      }
+                      return const SizedBox();
+                    })
                 : const SizedBox(),
             const SizedBox(width: 20),
             Expanded(
@@ -105,14 +132,6 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    firstBook.ean,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white,
-                    ),
-                  ),
                 ],
               ),
             )
@@ -146,28 +165,64 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                 ),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Image.asset(
-                    "assets/pricetag.png",
-                    width: 50,
-                  ),
-                  const SizedBox(width: 20),
-                  RichText(
-                    text: TextSpan(
-                      text: "Purchase prices\n",
-                      style: const TextStyle(color: Colors.black, fontSize: 12),
-                      children: [
-                        TextSpan(
-                          text: changePriceFromRadio(),
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                          ),
+                  Row(
+                    children: [
+                      const SizedBox(width: 20),
+                      Text(
+                        firstBook.ean,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
                         ),
-                      ],
-                    ),
+                      ),
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: firstBook.ean));
+                          const snackBar = SnackBar(
+                            content: SizedBox(
+                                height: 20,
+                                child: Center(
+                                    child: Text('Succes copy the code'))),
+                            duration: Duration(seconds: 3),
+                            backgroundColor: Colors.grey,
+                          );
+
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        },
+                        constraints: const BoxConstraints(),
+                        icon: const Icon(
+                          Icons.copy,
+                          size: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      const SizedBox(width: 20),
+                      RichText(
+                        text: TextSpan(
+                          text: "Purchase prices\n",
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 12),
+                          children: [
+                            TextSpan(
+                              text: changePriceFromRadio(),
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
