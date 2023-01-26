@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class ContainerPrice extends StatelessWidget {
-  const ContainerPrice({Key? key, required this.vendor, required this.price})
+  const ContainerPrice(
+      {Key? key,
+      required this.vendor,
+      required this.price,
+      required this.website})
       : super(key: key);
 
   final String vendor;
   final double price;
+  final String website;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +27,6 @@ class ContainerPrice extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           RichText(
             text: TextSpan(
@@ -38,7 +43,18 @@ class ContainerPrice extends StatelessWidget {
               ],
             ),
           ),
-          Text("€$price"),
+          const Spacer(),
+          Text("$price €"),
+          IconButton(
+            onPressed: () async {
+              if (!await launchUrlString(website,
+                  mode: LaunchMode.externalApplication)) {
+                throw Exception('Could not launch $website');
+              }
+            },
+            icon: const Icon(Icons.open_in_new),
+            alignment: Alignment.centerRight,
+          )
         ],
       ),
     );

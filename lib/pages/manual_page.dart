@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:upwork_barcode/pages/detail_page.dart';
 import 'package:upwork_barcode/providers/book_provider.dart';
-import 'package:upwork_barcode/service/api_service.dart';
 
 class ManualPage extends StatefulWidget {
   const ManualPage({Key? key}) : super(key: key);
@@ -18,8 +17,6 @@ class _ManualPageState extends State<ManualPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("BUILD MANUALPAGE");
-
     var bookProvider = Provider.of<BookProvider>(context, listen: false);
 
     void _onTap() async {
@@ -30,17 +27,19 @@ class _ManualPageState extends State<ManualPage> {
       await bookProvider
           .getProduct(productCodeController.text)
           .then((isSuccess) {
-        isLoading = false;
-        if (isSuccess) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const DetailPage()),
-          );
-        } else {
+        if (isSuccess == false) {
           setState(() {
             isLoading = false;
             isError = true;
           });
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const DetailPage()),
+          );
         }
       });
     }

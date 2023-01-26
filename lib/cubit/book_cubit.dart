@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:upwork_barcode/service/api_service.dart';
 
 part 'book_state.dart';
 

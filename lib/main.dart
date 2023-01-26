@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:upwork_barcode/pages/home_page.dart';
-import 'package:upwork_barcode/pages/scanner_page.dart';
 import 'package:upwork_barcode/providers/book_provider.dart';
 
 void main() {
