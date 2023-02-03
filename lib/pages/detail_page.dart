@@ -1,7 +1,9 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:upwork_barcode/model/book_model.dart';
+import 'package:upwork_barcode/service/database_service.dart';
 import 'package:upwork_barcode/widget/container_price.dart';
 import 'package:http/http.dart' as http;
 import '../providers/book_provider.dart';
@@ -14,6 +16,8 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  final dbService = DatabaseService.instance;
+
   String rateItemRadio = "priceVeryGood";
 
   List<BookModel> sortRate(List<BookModel> books) {
@@ -36,6 +40,10 @@ class _DetailPageState extends State<DetailPage> {
 
   bool imageReady = false;
 
+  bool _isSaved = false;
+
+  String? bookImage;
+
   checkImageValidity(String image) async {
     var url = Uri.parse(image);
     http.Response response = await http.get(url);
@@ -50,8 +58,40 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
+  final _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
+
+  void _showMessageInScaffold(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+    ));
+    setState(() {
+      _isSaved = !_isSaved;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkBookStatus();
+  }
+
+  void checkBookStatus() async {
+    _isSaved = await dbService.isSaved(
+        Provider.of<BookProvider>(context, listen: false).resultBooks[0].ean);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    var appBar = AppBar(
+      title: const Text("Purchase Offer"),
+      elevation: 0,
+    );
+
+    var screenHeight = MediaQuery.of(context).size.height;
+    var appBarHeight = appBar.preferredSize.height;
+    var bodyHeight = screenHeight - appBarHeight;
+
     var books = Provider.of<BookProvider>(context, listen: false).resultBooks;
     var firstBook = books[0];
 
@@ -82,22 +122,33 @@ class _DetailPageState extends State<DetailPage> {
     }
 
     Future<String?> checkImage(String url) async {
-      var image = Uri.parse(url);
-      http.Response response = await http.get(image);
-      try {
-        if (response.statusCode == 200) {
-          return "Done";
-        } else {
-          return "Failed";
+      String? status;
+
+      await Future.forEach(books, (book) async {
+        var buk = book as BookModel;
+        if (buk.imageUrl != null) {
+          var image = Uri.parse(buk.imageUrl!);
+          var response = await http.get(image);
+
+          if (response.statusCode == 200) {
+            status = "Done";
+            bookImage = buk.imageUrl;
+            return status;
+          }
         }
-      } catch (e) {
-        return "Failed";
+      });
+
+      if (status != "Done") {
+        status = "Failed";
       }
+
+      return status;
     }
 
     Widget bookSection() {
       return Container(
         width: double.infinity,
+        height: bodyHeight * 0.15,
         padding: const EdgeInsets.only(left: 30, right: 30, bottom: 30),
         decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
@@ -110,7 +161,7 @@ class _DetailPageState extends State<DetailPage> {
                     builder: (context, snapshot) {
                       if (snapshot.data == "Done") {
                         return Image.network(
-                          firstBook.imageUrl!,
+                          bookImage!,
                           height: 100.0,
                           fit: BoxFit.cover,
                         );
@@ -123,10 +174,13 @@ class _DetailPageState extends State<DetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  AutoSizeText(
                     firstBook.name,
+                    minFontSize: 12,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -227,7 +281,7 @@ class _DetailPageState extends State<DetailPage> {
                 ],
               ),
             ),
-            ...books
+            ...books.reversed
                 .map((book) => ContainerPrice(
                       vendor: book.vendorName,
                       price: priceConditionSelected(book),
@@ -328,17 +382,59 @@ class _DetailPageState extends State<DetailPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Purchase Offer"),
-        elevation: 0,
-      ),
+      key: _scaffoldKey,
+      appBar: appBar,
       body: ListView(
         children: [
-          bookSection(),
-          priceSection(),
+          Stack(
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  bookSection(),
+                  priceSection(),
+                ],
+              ),
+              Positioned(
+                right: (MediaQuery.of(context).size.width * 0.1),
+                top: (bodyHeight * 0.12),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(15),
+                    backgroundColor: (_isSaved) ? Colors.red : Colors.green,
+                    shape: const CircleBorder(),
+                  ),
+                  onPressed: () {
+                    (_isSaved)
+                        ? _deleteBook(
+                            ean: firstBook.ean,
+                          )
+                        : _saveBook(
+                            ean: firstBook.ean,
+                            name: firstBook.name,
+                            imageUrl: bookImage);
+                  },
+                  child: (_isSaved)
+                      ? const Icon(Icons.outbox)
+                      : const Icon(Icons.move_to_inbox),
+                ),
+              ),
+            ],
+          ),
           conditionSection(),
         ],
       ),
     );
+  }
+
+  void _saveBook(
+      {required String ean, required String name, String? imageUrl}) async {
+    final id = await dbService.insert(ean: ean, name: name, imageUrl: imageUrl);
+    _showMessageInScaffold("Book saved successfully");
+  }
+
+  void _deleteBook({required String ean}) async {
+    final deleted = await dbService.delete(ean);
+    _showMessageInScaffold("Cancel saved successfully");
   }
 }

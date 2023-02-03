@@ -35,16 +35,21 @@ class _ScannerPageState extends State<ScannerPage> {
     setState(() {
       isLoading = true;
     });
-    await context.read<BookProvider>().getProduct(code).then((isSuccess) {
+    await context.read<BookProvider>().getProduct(code).then((isSuccess) async {
       setState(() {
         isLoading = false;
       });
 
       if (isSuccess) {
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const DetailPage()),
         );
+
+        controller!.resumeCamera();
+        setState(() {
+          result = null;
+        });
       } else {
         final snackBar = SnackBar(
           content: SizedBox(
@@ -64,6 +69,7 @@ class _ScannerPageState extends State<ScannerPage> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     this.controller!.resumeCamera();
+
     controller.scannedDataStream.listen((scanData) {
       controller.pauseCamera();
       String searchCode = scanData.code.toString();
@@ -98,6 +104,12 @@ class _ScannerPageState extends State<ScannerPage> {
               child: QRView(
                 key: qrKey,
                 onQRViewCreated: _onQRViewCreated,
+                overlay: QrScannerOverlayShape(
+                    borderWidth: 4,
+                    borderLength: 10,
+                    borderColor: Colors.white,
+                    cutOutHeight: MediaQuery.of(context).size.height * 0.2,
+                    cutOutWidth: MediaQuery.of(context).size.width * 0.8),
               ),
             ),
             Expanded(
