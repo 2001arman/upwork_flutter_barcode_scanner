@@ -18,7 +18,7 @@ class ApiService {
         "https://www.awin1.com/awclick.php?gid=362161&mid=11487&awinaffid=533731&linkid=2375984&clickref=",
     "gameworld": "https://t.adcell.com/p/click?promoId=81807&slotId=104502",
     "studibuch": "https://studibuch.de/",
-    "zoxs": "https://www.zoxs.de/",
+    "zoxs": "https://t.adcell.com/p/click?promoId=140635&slotId=104502",
     "rebuy": "https://www.rebuy.de/",
     "sellorado": "https://www.sellorado.de/",
   };

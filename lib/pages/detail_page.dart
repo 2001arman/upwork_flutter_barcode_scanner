@@ -59,13 +59,13 @@ class _DetailPageState extends State<DetailPage> {
 
     String changePriceFromRadio() {
       if (rateItemRadio == "priceLikeNew") {
-        return "${books[0].priceLikeNew / 100} € - ${books.last.priceLikeNew / 100} €";
+        return "€${books[0].priceLikeNew / 100} - €${books.last.priceLikeNew / 100}";
       } else if (rateItemRadio == "priceGood") {
-        return "${books[0].priceGood / 100} € - ${books.last.priceGood / 100} €";
+        return "€${books[0].priceGood / 100} - €${books.last.priceGood / 100}";
       } else if (rateItemRadio == "priceAcceptable") {
-        return "${books[0].priceAcceptable / 100} € - ${books.last.priceAcceptable / 100} €";
+        return "€${books[0].priceAcceptable / 100} - €${books.last.priceAcceptable / 100}";
       } else {
-        return "${books[0].priceVeryGood / 100} € - ${books.last.priceVeryGood / 100} €";
+        return "€${books[0].priceVeryGood / 100} - €${books.last.priceVeryGood / 100}";
       }
     }
 
@@ -227,7 +227,7 @@ class _DetailPageState extends State<DetailPage> {
                 ],
               ),
             ),
-            ...books
+            ...books.reversed
                 .map((book) => ContainerPrice(
                       vendor: book.vendorName,
                       price: priceConditionSelected(book),

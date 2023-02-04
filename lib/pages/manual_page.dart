@@ -16,6 +16,12 @@ class _ManualPageState extends State<ManualPage> {
   bool isLoading = false;
 
   @override
+  void dispose() {
+    super.dispose();
+    productCodeController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var bookProvider = Provider.of<BookProvider>(context, listen: false);
 
@@ -50,6 +56,11 @@ class _ManualPageState extends State<ManualPage> {
         children: [
           TextField(
             controller: productCodeController,
+            maxLength: 13,
+            keyboardType: TextInputType.number,
+            onChanged: (newString) {
+              setState(() {});
+            },
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
               hintText: "Barcode",
@@ -57,24 +68,35 @@ class _ManualPageState extends State<ManualPage> {
             ),
           ),
           GestureDetector(
-            onTap: (isLoading) ? null : _onTap,
+            onTap: (isLoading)
+                ? null
+                : productCodeController.text.length == 13
+                    ? _onTap
+                    : null,
             child: Container(
               width: double.infinity,
               height: 50,
               margin: const EdgeInsets.only(top: 20),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: const Color(0xFFDCDCDC),
+                color: productCodeController.text.length == 13
+                    ? Colors.blue
+                    : const Color(0xFFDCDCDC),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: (isLoading)
                   ? const SizedBox(
-                      width: 25, height: 25, child: CircularProgressIndicator())
-                  : const Text(
+                      width: 25,
+                      height: 25,
+                      child: CircularProgressIndicator(color: Colors.white),
+                    )
+                  : Text(
                       "SEARCH ITEM",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey,
+                        color: productCodeController.text.length == 13
+                            ? Colors.white
+                            : Colors.grey,
                       ),
                     ),
             ),
