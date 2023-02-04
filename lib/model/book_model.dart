@@ -11,6 +11,7 @@ class BookModel {
     required this.website,
     this.imageUrl,
   });
+
   late final String name;
   late final String ean;
   late final String vendorName;
