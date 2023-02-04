@@ -91,7 +91,7 @@ class _ManualPageState extends State<ManualPage> {
                       child: CircularProgressIndicator(color: Colors.white),
                     )
                   : Text(
-                      "SEARCH ITEM",
+                      "Artikel suchen",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: productCodeController.text.length == 13
@@ -103,7 +103,7 @@ class _ManualPageState extends State<ManualPage> {
           ),
           const SizedBox(height: 10),
           const Text(
-            "The barcode number is usually located on the back of the item or on the packaging above or below the barcode. Many barcodes have 13 digits (EAN13) and mostly consist of digits. Unfortunately, product designations (e.g the title of a book) are not supported.",
+            "Die Barcode-Nummer befindet sich meist auf der Artikel­rückseite oder der Verpackung ober- oder unterhalb des Strich­codes. Viele Barcodes sind 13-stellig (EAN13) und bestehen größten­teils aus Ziffern. Produkt­bezeichnungen (z.B. der Buch­titel) werden leider nicht unter­stützt.",
             style: TextStyle(
               color: Colors.grey,
               height: 1.3,

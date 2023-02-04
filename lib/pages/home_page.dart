@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
         text: "Barcode Scanner",
       ),
       Tab(
-        text: "Manual Input",
+        text: "Manuelle Eingabe",
       ),
     ];
 
@@ -39,8 +39,6 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(width: 10),
-            const Icon(Icons.more_vert),
             const SizedBox(width: 10),
           ],
           bottom: TabBar(

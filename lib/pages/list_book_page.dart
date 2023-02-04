@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:upwork_barcode/providers/book_provider.dart';
@@ -49,7 +47,7 @@ class _ListBookPageState extends State<ListBookPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Favorite Book"),
+        title: const Text("Aufteilung"),
         elevation: 0,
       ),
       body: Stack(
