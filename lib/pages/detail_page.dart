@@ -53,9 +53,8 @@ class _DetailPageState extends State<DetailPage> {
           imageReady = true; // It's valid
         });
       }
-    } catch (e) {
-      print(e.toString());
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   final _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
