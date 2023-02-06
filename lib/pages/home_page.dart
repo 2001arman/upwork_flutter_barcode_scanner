@@ -26,7 +26,7 @@ class HomePage extends StatelessWidget {
       length: tabs.length,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Sell4More"),
+          title: const Text("Anunsverkaufen.de"),
           actions: [
             IconButton(
               icon: const Icon(Icons.inbox),
